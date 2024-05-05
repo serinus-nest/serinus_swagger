@@ -1,0 +1,40 @@
+openapi: '3.0.0'
+info: 
+  title: 'Serinus API'
+  version: '1.0'
+  description: 'API documentation for the Serinus project'
+paths: 
+  /: 
+    get: 
+      tags: 
+        - 'AppController'
+      responses: 
+        200: 
+          description: 'Hello world response'
+          content: 
+            text/plain: 
+              type: 'text/plain'
+              schema: 
+                type: 'text'
+                example: 'Hello world'
+  /post: 
+    post: 
+      tags: 
+        - 'AppController'
+      responses: 
+        200: 
+          description: 'Post response'
+          content: 
+            application/json: 
+              type: 'application/json'
+              schema: 
+                type: 'object'
+                properties: 
+                  message: 
+                    type: 'text'
+                    example: 'Post route'
+            text/plain: 
+              type: 'text/plain'
+              schema: 
+                type: 'text'
+                example: 'Post route'
