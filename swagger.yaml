@@ -1,6 +1,6 @@
 openapi: '3.0.0'
 info: 
-  title: 'Serinus API'
+  title: 'Serinus Test Swagger'
   version: '1.0'
   description: 'API documentation for the Serinus project'
 paths: 
@@ -17,6 +17,13 @@ paths:
               schema: 
                 type: 'text'
                 example: 'Hello world'
+    parameters: 
+      - name: 'name'
+        in: 'query'
+        required: false
+        deprecated: false
+        description: null
+        allowEmptyValue: false
   /post: 
     post: 
       tags: 
@@ -38,3 +45,40 @@ paths:
               schema: 
                 type: 'text'
                 example: 'Post route'
+    parameters: []
+  /a/: 
+    get: 
+      tags: 
+        - 'App2Controller'
+      responses: 
+        200: 
+          description: 'Hello world response'
+          content: 
+            text/plain: 
+              type: 'text/plain'
+              schema: 
+                type: 'text'
+                example: 'Hello world'
+    parameters: []
+  /a/post: 
+    post: 
+      tags: 
+        - 'App2Controller'
+      responses: 
+        200: 
+          description: 'Post response'
+          content: 
+            application/json: 
+              type: 'application/json'
+              schema: 
+                type: 'object'
+                properties: 
+                  message: 
+                    type: 'text'
+                    example: 'Post route'
+            text/plain: 
+              type: 'text/plain'
+              schema: 
+                type: 'text'
+                example: 'Post route'
+    parameters: []

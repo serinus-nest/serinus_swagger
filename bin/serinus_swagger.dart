@@ -5,7 +5,7 @@ import 'package:serinus/serinus.dart';
 
 class HelloWorldRoute extends ApiSpecRoute {
 
-  HelloWorldRoute() : super(
+  HelloWorldRoute({super.queryParameters}) : super(
     path: '/',
     apiSpec: ApiSpec(
       responses: [
@@ -66,6 +66,23 @@ class PostRoute extends ApiSpecRoute {
 class AppController extends Controller {
 
   AppController({super.path = '/'}){
+    on(HelloWorldRoute(
+      queryParameters: {
+        'name': String,
+      }
+    ), _handleHelloWorld);
+    on(PostRoute(path: '/post'), (context) async => Response.json({'message': 'Post route'}));
+  }
+
+  Future<Response> _handleHelloWorld(RequestContext context) async {
+    return Response.text('Hello world');
+  }
+
+}
+
+class App2Controller extends Controller {
+
+  App2Controller({super.path = '/a'}){
     on(HelloWorldRoute(), _handleHelloWorld);
     on(PostRoute(path: '/post'), (context) async => Response.json({'message': 'Post route'}));
   }
@@ -80,7 +97,8 @@ class AppModule extends Module {
 
   AppModule(): super(
     controllers: [
-      AppController()
+      AppController(),
+      App2Controller()
     ],
     imports: [
       App2Module()
@@ -97,7 +115,7 @@ class App2Module extends Module {
 
 void main(List<String> args) async {
   final document = DocumentSpecification(
-    title: 'Serinus API',
+    title: 'Serinus Test Swagger',
     version: '1.0',
     description: 'API documentation for the Serinus project',
   );

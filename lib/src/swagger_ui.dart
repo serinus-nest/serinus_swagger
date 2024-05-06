@@ -112,6 +112,7 @@ class SwaggerYamlSpec {
         }
         methodObj['responses'] = responsesObj;
         pathObj[method.method] = methodObj;
+        pathObj['parameters'] = method.parameters.where((element) => !element.ignore).toList();
       }
       pathsObj[obj.path] = pathObj;
     }
@@ -157,6 +158,7 @@ class PathMethod {
     final String? description;
     final List<String> tags;
     final List<ApiResponse> responses;
+    final List<ApiSpecParameter> parameters;
   
     PathMethod({
       required this.method,
@@ -164,5 +166,6 @@ class PathMethod {
       required this.responses,
       this.summary,
       this.description,
+      this.parameters = const []
     });
 }

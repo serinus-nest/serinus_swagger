@@ -57,6 +57,10 @@ class SwaggerModule {
               '$controllerName'
             }), 
             responses: apiSpec.responses,
+            parameters: [
+              ...apiSpec.parameters,
+              ...apiSpec.intersectQueryParameters(route.route.queryParameters)
+            ],
             summary: apiSpec.summary,
             description: apiSpec.description
           ));
