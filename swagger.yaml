@@ -16,7 +16,7 @@ paths:
               type: 'text/plain'
               schema: 
                 type: 'text'
-                example: 'Hello world'
+                example: 'Post route'
     parameters: 
       - name: 'name'
         in: 'query'
@@ -58,7 +58,7 @@ paths:
               type: 'text/plain'
               schema: 
                 type: 'text'
-                example: 'Hello world'
+                example: 'Post route'
     parameters: []
   /a/post: 
     post: 

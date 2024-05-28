@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:serinus/serinus.dart';
 import 'package:serinus_swagger/serinus_swagger.dart';
-import 'package:serinus_swagger/src/document.dart';
 import 'package:serinus_swagger/src/swagger_ui.dart';
 import 'package:serinus_swagger/src/swagger_ui_module.dart';
 
@@ -13,17 +12,25 @@ class SwaggerModule {
   SwaggerYamlSpec? _swaggerYamlSpec;
   SwaggerUiModule? _swaggerUiModule;
   String? _swaggerUrl;
+  final List<ContentSchema>? schemas;
 
 
-  static Future<SwaggerModule> create(Application app, DocumentSpecification document) async {
-    final swagger = SwaggerModule._(app, document);
-    swagger.exploreModules();
+  static Future<SwaggerModule> create(
+    Application app, 
+    DocumentSpecification document,
+    {
+      List<ContentSchema>? schemas,
+    }
+  ) async {
+    final swagger = SwaggerModule._(app, document, schemas);
+    await swagger.exploreModules();
     return swagger;
   }
 
-  SwaggerModule._(this.app, this.document);
+  SwaggerModule._(this.app, this.document, this.schemas);
 
   Future<void> exploreModules() async {
+    await app.register();
     final paths = <PathObject>[];
     final globalPrefix = app.config.globalPrefix;
     final versioning = app.config.versioningOptions;
@@ -94,7 +101,10 @@ class SwaggerModule {
       description: document.description,
       host: 'localhost:8080',
       basePath: '/',
-      paths: paths
+      paths: paths,
+      components: {
+        'schemas': schemas?.map((e) => e).toList()
+      }
     );
     File('swagger.yaml').writeAsString(_swaggerYamlSpec!());
     StringBuffer sb = StringBuffer();

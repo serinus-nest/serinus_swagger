@@ -61,6 +61,7 @@ class SwaggerYamlSpec {
   final String host;
   final String basePath;
   final List<PathObject> paths;
+  final Map<String, dynamic> components;
 
   SwaggerYamlSpec({
     required this.title,
@@ -69,6 +70,7 @@ class SwaggerYamlSpec {
     required this.host,
     required this.basePath,
     required this.paths,
+    this.components = const {},
   });
 
   String call() {
@@ -81,7 +83,7 @@ class SwaggerYamlSpec {
         'description': description,
       },
       'paths': preparePathObj(),
-    
+      'components': components,
     });
     
     return doc.toString();
@@ -132,7 +134,7 @@ class SwaggerYamlSpec {
       } 
     }
     if(schema.example != null){
-      schemaObj['example'] = schema.example;
+      schemaObj['example'] = schema.getExample();
     }
     return schemaObj;
   }

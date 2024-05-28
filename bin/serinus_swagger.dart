@@ -17,7 +17,7 @@ class HelloWorldRoute extends ApiSpecRoute {
               type: ContentType.text,
               schema: ContentSchema(
                 type: ContentSchemaType.text,
-                example: 'Hello world'
+                example: ContentSchemaValue<String>(value: 'Post route')
               )
             )
           ]
@@ -43,7 +43,7 @@ class PostRoute extends ApiSpecRoute {
                 properties: {
                   'message': ContentSchema(
                     type: ContentSchemaType.text,
-                    example: 'Post route'
+                    example: ContentSchemaValue<String>(value: 'Post route')
                   )
                 }
               )
@@ -52,7 +52,7 @@ class PostRoute extends ApiSpecRoute {
               type: ContentType.text,
               schema: ContentSchema(
                 type: ContentSchemaType.text,
-                example: 'Post route'
+                example: ContentSchemaValue<String>(value: 'Post route')
               )
             )
           ]
@@ -119,11 +119,13 @@ void main(List<String> args) async {
     version: '1.0',
     description: 'API documentation for the Serinus project',
   );
-
   final app = await serinus.createApplication(
     entrypoint: AppModule(),
   );
   final swagger = await SwaggerModule.create(app, document);
-  await swagger.setup('/api');
+  await swagger.setup(
+    '/api',
+    
+  );
   await app.serve();
 }

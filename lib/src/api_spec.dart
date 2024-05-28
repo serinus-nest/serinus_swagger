@@ -80,10 +80,10 @@ enum ContentSchemaType {
   boolean,
 }
 
-class ContentSchema {
+class ContentSchema<T> {
 
   final ContentSchemaType type;
-  final dynamic example;
+  final ContentSchemaValue<T>? example;
   final Map<String, ContentSchema>? properties;
 
   ContentSchema({
@@ -100,6 +100,41 @@ class ContentSchema {
       }
     }
   }
+
+  dynamic getExample() {
+    switch(type) {
+      case ContentSchemaType.text:
+        return example?.value.toString() ?? '';
+      case ContentSchemaType.object:
+        final Map<String, dynamic> obj = {};
+        for(final key in properties!.keys){
+          obj[key] = properties![key]!.getExample();
+        }
+        return obj;
+      case ContentSchemaType.ref:
+        return example?.value.toString() ?? '';
+      case ContentSchemaType.array:
+        return [...(properties?.values.map((e) => e.getExample()) ?? [])];
+      case ContentSchemaType.number:
+        return example?.value ?? 0;
+      case ContentSchemaType.integer:
+        return example?.value ?? 0;
+      case ContentSchemaType.boolean:
+        return example?.value ?? false;
+      default:
+        return {};
+    } 
+  }
+
+}
+
+class ContentSchemaValue<T> {
+
+  final T value;
+
+  const ContentSchemaValue({
+    required this.value,
+  });
 
 }
 
