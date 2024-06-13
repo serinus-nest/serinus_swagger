@@ -2,18 +2,26 @@ import 'dart:io';
 
 import 'package:serinus_swagger/serinus_swagger.dart';
 import 'package:serinus/serinus.dart';
+import 'package:serinus_swagger/src/swagger_ui.dart';
 
 class HelloWorldRoute extends ApiSpecRoute {
 
   HelloWorldRoute({super.queryParameters}) : super(
     path: '/',
     apiSpec: ApiSpec(
+      parameters: [
+        ApiSpecParameter(
+          name: 'name',
+          type: SpecParameterType.query,
+          required: false,
+        )
+      ],
       responses: [
         ApiResponse(
           code: 200,
           description: 'Hello world response',
           content: [
-            ApiResponseContent(
+            ApiContent(
               type: ContentType.text,
               schema: ContentSchema(
                 type: ContentSchemaType.text,
@@ -31,24 +39,31 @@ class PostRoute extends ApiSpecRoute {
 
   PostRoute({required super.path}) : super(
     apiSpec: ApiSpec(
+      requestBody: RequestBody(
+        required: false,
+        content: [
+          ApiContent(
+            type: ContentType.json,
+            schema: ContentSchema(
+              type: ContentSchemaType.ref,
+              value: 'User'
+            )
+          )
+        ]
+      ),
       responses: [
         ApiResponse(
           code: 200,
           description: 'Post response',
           content: [
-            ApiResponseContent(
+            ApiContent(
               type: ContentType.json,
               schema: ContentSchema(
-                type: ContentSchemaType.object,
-                properties: {
-                  'message': ContentSchema(
-                    type: ContentSchemaType.text,
-                    example: ContentSchemaValue<String>(value: 'Post route')
-                  )
-                }
+                type: ContentSchemaType.ref,
+                value: 'User'
               )
             ),
-            ApiResponseContent(
+            ApiContent(
               type: ContentType.text,
               schema: ContentSchema(
                 type: ContentSchemaType.text,
@@ -71,7 +86,7 @@ class AppController extends Controller {
         'name': String,
       }
     ), _handleHelloWorld);
-    on(PostRoute(path: '/post'), (context) async => Response.json({'message': 'Post route'}));
+    on(PostRoute(path: '/post/<data>'), (context) async => Response.json({'message': 'Post ${context.pathParameters['data']}'}));
   }
 
   Future<Response> _handleHelloWorld(RequestContext context) async {
@@ -122,10 +137,25 @@ void main(List<String> args) async {
   final app = await serinus.createApplication(
     entrypoint: AppModule(),
   );
-  final swagger = await SwaggerModule.create(app, document);
+  final swagger = await SwaggerModule.create(
+    app, 
+    document,
+    schemas: [
+      Component(
+        name: 'User', 
+        value: ContentSchema(
+          type: ContentSchemaType.object, 
+          value: {
+            'name': ContentSchema(),
+            'age': ContentSchema(type: ContentSchemaType.integer),
+            'email': ContentSchema(),
+          }
+        )
+      )
+    ]
+  );
   await swagger.setup(
     '/api',
-    
   );
   await app.serve();
 }

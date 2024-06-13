@@ -245,10 +245,10 @@ packages:
     dependency: "direct main"
     description:
       name: serinus
-      sha256: a16afcce5d95a9d651614b9a21775c6c7d454d4f0ed83223067a4cce88bfecba
+      sha256: "73085c94867dc1ccdf7ae84e8be8b118568c579935e3ded1c0dbbc035dd9d18c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.4.1"
   shelf:
     dependency: transitive
     description:
@@ -309,10 +309,10 @@ packages:
     dependency: transitive
     description:
       name: spanner
-      sha256: "6e7c83fda01e046f2b4088f22a0f09bff75ec0d5aa999b8de9356b722eb1acac"
+      sha256: "72295ca005a56105fccb59d44303505685eaffecc738b0987b04fdf8e4b2190f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1+4"
+    version: "1.0.1+5"
   sprintf:
     dependency: transitive
     description:

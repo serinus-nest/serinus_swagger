@@ -12,14 +12,14 @@ class SwaggerModule {
   SwaggerYamlSpec? _swaggerYamlSpec;
   SwaggerUiModule? _swaggerUiModule;
   String? _swaggerUrl;
-  final List<ContentSchema>? schemas;
+  final List<Component<ContentSchema>>? schemas;
 
 
   static Future<SwaggerModule> create(
     Application app, 
     DocumentSpecification document,
     {
-      List<ContentSchema>? schemas,
+      List<Component<ContentSchema>>? schemas,
     }
   ) async {
     final swagger = SwaggerModule._(app, document, schemas);
@@ -42,7 +42,21 @@ class SwaggerModule {
       final controllerPath = controller.path;
       final controllerName = controller.runtimeType;
       for(final route in controller.routes.keys){
-        final routePath = route.path;
+        final pathParameters = <ApiSpecParameter>[];
+        final routePath = route.path.split('/');
+        for(final path in routePath){
+          if(path.startsWith('<') && path.endsWith('>')){
+            final pathName = path.substring(1, path.length - 1);
+            routePath[routePath.indexOf(path)] = '{$pathName}';
+            pathParameters.add(
+              ApiSpecParameter(
+                name: pathName, 
+                type: SpecParameterType.path,
+                required: true,
+              )
+            );
+          }
+        }
         final routeMethod = route.method;
         StringBuffer sb = StringBuffer();
         if(globalPrefix != null){
@@ -52,11 +66,16 @@ class SwaggerModule {
           sb.write('/v${versioning.version}');
         }
         sb.write('/$controllerPath');
-        sb.write('/$routePath');
+        sb.write('/${routePath.join('/')}');
         final finalPath = normalizePath(sb.toString());
         final pathObj = paths.firstWhere((element) => element.path == finalPath, orElse: () => PathObject(path: finalPath, methods: []));
         if(route.route is ApiSpecRoute) {
           final apiSpec = (route.route as ApiSpecRoute).apiSpec;
+          final parameters = [
+            ...apiSpec.parameters,
+            ...apiSpec.intersectQueryParameters(route.route.queryParameters),
+            ...pathParameters
+          ];
           pathObj.methods.add(PathMethod(
             method: routeMethod.name.toLowerCase(), 
             tags: List<String>.from({
@@ -64,10 +83,10 @@ class SwaggerModule {
               '$controllerName'
             }), 
             responses: apiSpec.responses,
-            parameters: [
-              ...apiSpec.parameters,
-              ...apiSpec.intersectQueryParameters(route.route.queryParameters)
-            ],
+            requestBody: apiSpec.requestBody,
+            parameters: {
+              for(final param in parameters) param.name: param
+            }.values.toList(),
             summary: apiSpec.summary,
             description: apiSpec.description
           ));
@@ -80,7 +99,7 @@ class SwaggerModule {
                 code: 200,
                 description: 'Success',
                 content: [
-                  ApiResponseContent(
+                  ApiContent(
                     type: ContentType.text,
                     schema: ContentSchema()
                   )
@@ -103,10 +122,10 @@ class SwaggerModule {
       basePath: '/',
       paths: paths,
       components: {
-        'schemas': schemas?.map((e) => e).toList()
+        'schemas': schemas ?? []
       }
     );
-    File('swagger.yaml').writeAsString(_swaggerYamlSpec!());
+    await File('swagger.yaml').writeAsString(_swaggerYamlSpec!());
     StringBuffer sb = StringBuffer();
     if(globalPrefix != null){
       sb.write('/$globalPrefix');

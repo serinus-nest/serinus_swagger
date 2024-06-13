@@ -8,7 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  serinus: ^0.3.0
+  serinus: ^0.4.1
   yaml_writer: ^2.0.0
   # path: ^1.8.0
 

@@ -15,7 +15,7 @@ paths:
             text/plain: 
               type: 'text/plain'
               schema: 
-                type: 'text'
+                type: 'string'
                 example: 'Post route'
     parameters: 
       - name: 'name'
@@ -24,10 +24,16 @@ paths:
         deprecated: false
         description: null
         allowEmptyValue: false
-  /post: 
+  /post/{data}: 
     post: 
       tags: 
         - 'AppController'
+      requestBody: 
+        required: false
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/User'
       responses: 
         200: 
           description: 'Post response'
@@ -35,17 +41,19 @@ paths:
             application/json: 
               type: 'application/json'
               schema: 
-                type: 'object'
-                properties: 
-                  message: 
-                    type: 'text'
-                    example: 'Post route'
+                $ref: '#/components/schemas/User'
             text/plain: 
               type: 'text/plain'
               schema: 
-                type: 'text'
+                type: 'string'
                 example: 'Post route'
-    parameters: []
+    parameters: 
+      - name: 'data'
+        in: 'path'
+        required: true
+        deprecated: false
+        description: null
+        allowEmptyValue: false
   /a/: 
     get: 
       tags: 
@@ -57,13 +65,25 @@ paths:
             text/plain: 
               type: 'text/plain'
               schema: 
-                type: 'text'
+                type: 'string'
                 example: 'Post route'
-    parameters: []
+    parameters: 
+      - name: 'name'
+        in: 'query'
+        required: false
+        deprecated: false
+        description: null
+        allowEmptyValue: false
   /a/post: 
     post: 
       tags: 
         - 'App2Controller'
+      requestBody: 
+        required: false
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/User'
       responses: 
         200: 
           description: 'Post response'
@@ -71,14 +91,21 @@ paths:
             application/json: 
               type: 'application/json'
               schema: 
-                type: 'object'
-                properties: 
-                  message: 
-                    type: 'text'
-                    example: 'Post route'
+                $ref: '#/components/schemas/User'
             text/plain: 
               type: 'text/plain'
               schema: 
-                type: 'text'
+                type: 'string'
                 example: 'Post route'
     parameters: []
+components: 
+  schemas: 
+    User: 
+      type: 'object'
+      properties: 
+        name: 
+          type: 'string'
+        age: 
+          type: 'integer'
+        email: 
+          type: 'string'
