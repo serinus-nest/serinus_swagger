@@ -69,8 +69,8 @@ class SwaggerModule {
         sb.write('/${routePath.join('/')}');
         final finalPath = normalizePath(sb.toString());
         final pathObj = paths.firstWhere((element) => element.path == finalPath, orElse: () => PathObject(path: finalPath, methods: []));
-        if(route.route is ApiSpecRoute) {
-          final apiSpec = (route.route as ApiSpecRoute).apiSpec;
+        if(route.route is ApiRoute) {
+          final apiSpec = (route.route as ApiRoute).apiSpec;
           final parameters = [
             ...apiSpec.parameters,
             ...apiSpec.intersectQueryParameters(route.route.queryParameters),

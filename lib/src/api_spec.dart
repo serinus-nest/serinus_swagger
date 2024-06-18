@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:serinus/serinus.dart';
 
-abstract class ApiSpecRoute extends Route {
+abstract class ApiRoute extends Route {
 
   final ApiSpec apiSpec;
 
-  const ApiSpecRoute({
+  const ApiRoute({
     required super.path,
     required this.apiSpec,
     super.method = HttpMethod.get,

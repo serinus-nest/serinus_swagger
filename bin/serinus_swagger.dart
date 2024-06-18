@@ -4,7 +4,7 @@ import 'package:serinus_swagger/serinus_swagger.dart';
 import 'package:serinus/serinus.dart';
 import 'package:serinus_swagger/src/swagger_ui.dart';
 
-class HelloWorldRoute extends ApiSpecRoute {
+class HelloWorldRoute extends ApiRoute {
 
   HelloWorldRoute({super.queryParameters}) : super(
     path: '/',
@@ -35,7 +35,7 @@ class HelloWorldRoute extends ApiSpecRoute {
   );
 }
 
-class PostRoute extends ApiSpecRoute {
+class PostRoute extends ApiRoute {
 
   PostRoute({required super.path}) : super(
     apiSpec: ApiSpec(
