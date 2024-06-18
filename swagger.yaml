@@ -109,3 +109,10 @@ components:
           type: 'integer'
         email: 
           type: 'string'
+  securitySchemes: 
+    apiKeyScheme: 
+      type: 'apiKey'
+      in: 'header'
+      name: 'Authorization'
+security: 
+  - apiKeyScheme: []

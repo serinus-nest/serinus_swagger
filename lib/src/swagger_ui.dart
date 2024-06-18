@@ -62,6 +62,7 @@ class SwaggerYamlSpec {
   final String basePath;
   final List<PathObject> paths;
   final Map<String, List<Component>> components;
+  final List<Map<String, List<dynamic>>> security;
 
   SwaggerYamlSpec({
     required this.title,
@@ -71,6 +72,7 @@ class SwaggerYamlSpec {
     required this.basePath,
     required this.paths,
     this.components = const {},
+    this.security = const [],
   });
 
   String call() {
@@ -84,6 +86,7 @@ class SwaggerYamlSpec {
       },
       'paths': preparePathObj(),
       'components': generateRecursiveComponent(),
+      'security': security,
     });
     
     return doc.toString();

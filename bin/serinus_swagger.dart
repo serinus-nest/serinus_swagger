@@ -140,7 +140,7 @@ void main(List<String> args) async {
   final swagger = await SwaggerModule.create(
     app, 
     document,
-    schemas: [
+    components: [
       Component(
         name: 'User', 
         value: ContentSchema(
@@ -150,6 +150,14 @@ void main(List<String> args) async {
             'age': ContentSchema(type: ContentSchemaType.integer),
             'email': ContentSchema(),
           }
+        )
+      ),
+      Component<SecuritySchema>(
+        name: 'apiKeyScheme',
+        value: SecuritySchema(
+          type: SecuritySchemaType.apiKey,
+          name: 'Authorization',
+          inType: SpecParameterType.header
         )
       )
     ]

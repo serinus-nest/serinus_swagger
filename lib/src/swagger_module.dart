@@ -12,22 +12,22 @@ class SwaggerModule {
   SwaggerYamlSpec? _swaggerYamlSpec;
   SwaggerUiModule? _swaggerUiModule;
   String? _swaggerUrl;
-  final List<Component<ContentSchema>>? schemas;
+  final List<Component>? components;
 
 
   static Future<SwaggerModule> create(
     Application app, 
     DocumentSpecification document,
     {
-      List<Component<ContentSchema>>? schemas,
+      List<Component>? components,
     }
   ) async {
-    final swagger = SwaggerModule._(app, document, schemas);
+    final swagger = SwaggerModule._(app, document, components);
     await swagger.exploreModules();
     return swagger;
   }
 
-  SwaggerModule._(this.app, this.document, this.schemas);
+  SwaggerModule._(this.app, this.document, this.components);
 
   Future<void> exploreModules() async {
     await app.register();
@@ -114,6 +114,7 @@ class SwaggerModule {
       }
 
     }
+    final securitySchema = components?.where((element) => element.value is SecuritySchema).toList() ?? [];
     _swaggerYamlSpec = SwaggerYamlSpec(
       title: document.title,
       version: document.version,
@@ -122,8 +123,10 @@ class SwaggerModule {
       basePath: '/',
       paths: paths,
       components: {
-        'schemas': schemas ?? []
-      }
+        'schemas': components?.where((element) => element.value is ContentSchema).toList() ?? [],
+        'securitySchemes': securitySchema
+      },
+      security: securitySchema.where((element) => element.value.isDefault).map((e) => {e.name: []}).toList()
     );
     await File('swagger.yaml').writeAsString(_swaggerYamlSpec!());
     StringBuffer sb = StringBuffer();

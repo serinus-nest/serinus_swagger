@@ -226,3 +226,74 @@ class ApiSpecParameter {
   }
 
 }
+
+class SecuritySchema {
+
+  final SecuritySchemaType type;
+  final SecuritySchemaScheme? scheme;
+  final String? bearerFormat;
+  final SpecParameterType? inType;
+  final String? name;
+  final bool isDefault;
+
+  SecuritySchema({
+    required this.type,
+    this.scheme,
+    this.bearerFormat,
+    this.inType,
+    this.name,
+    this.isDefault = true,
+  }) {
+    if(type == SecuritySchemaType.apiKey && inType == null) {
+      throw Exception('inType must be provided for apiKey type');
+    }
+    if(type == SecuritySchemaType.apiKey && name == null) {
+      throw Exception('name must be provided for apiKey type');
+    }
+    if(
+      type == SecuritySchemaType.apiKey && ![
+        SpecParameterType.header, 
+        SpecParameterType.cookie, 
+        SpecParameterType.query
+      ].contains(inType)
+    ) {
+      throw Exception('inType must be header, cookie or query for apiKey type');
+    }
+    if(type == SecuritySchemaType.http && scheme == null) {
+      throw Exception('scheme must be provided for http type');
+    }
+    if(type == SecuritySchemaType.http && scheme == SecuritySchemaScheme.bearer && bearerFormat == null) {
+      throw Exception('bearerFormat must be provided for bearer scheme');
+    }
+  } 
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> schemaObj = {
+      'type': type.toString().split('.').last,
+    };
+    if(type == SecuritySchemaType.apiKey) {
+      schemaObj['in'] = inType.toString().split('.').last;
+      schemaObj['name'] = name;
+    }
+    if(type == SecuritySchemaType.http) {
+      schemaObj['scheme'] = scheme.toString().split('.').last;
+      if(scheme == SecuritySchemaScheme.bearer) {
+        schemaObj['bearerFormat'] = bearerFormat;
+      }
+    }
+    return schemaObj;
+  }
+
+}
+
+enum SecuritySchemaType {
+  apiKey,
+  http,
+  oauth2,
+  openIdConnect,
+}
+
+enum SecuritySchemaScheme {
+  bearer,
+  basic,
+}
