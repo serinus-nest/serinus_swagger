@@ -3,6 +3,13 @@ info:
   title: 'Serinus Test Swagger'
   version: '1.0'
   description: 'API documentation for the Serinus project'
+  contact: 
+    name: 'Serinus'
+    url: 'https://serinus.dev'
+    email: ''
+  license: 
+    name: 'MIT'
+    url: 'https://opensource.org/licenses/MIT'
 paths: 
   /: 
     get: 
@@ -10,20 +17,18 @@ paths:
         - 'AppController'
       responses: 
         200: 
-          description: 'Hello world response'
+          description: 'Success response'
+          headers: {}
           content: 
             text/plain: 
-              type: 'text/plain'
               schema: 
-                type: 'string'
-                example: 'Post route'
+                $ref: '#/components/responses/SuccessResponse'
     parameters: 
       - name: 'name'
         in: 'query'
+        schema: {}
         required: false
         deprecated: false
-        description: null
-        allowEmptyValue: false
   /post/{data}: 
     post: 
       tags: 
@@ -33,47 +38,54 @@ paths:
         content: 
           application/json: 
             schema: 
-              $ref: '#/components/schemas/User'
+              type: 'string'
+              example: 'John Doe'
       responses: 
         200: 
-          description: 'Post response'
+          description: 'Success response'
+          headers: 
+            sec: 
+              description: 'Security header'
+              schema: 
+                type: 'string'
+              required: false
+              deprecated: false
           content: 
             application/json: 
-              type: 'application/json'
               schema: 
-                $ref: '#/components/schemas/User'
+                type: 'object'
+                properties: 
+                  message: 
+                    type: 'string'
+                    example: 'Post route'
             text/plain: 
-              type: 'text/plain'
               schema: 
                 type: 'string'
                 example: 'Post route'
     parameters: 
       - name: 'data'
         in: 'path'
+        schema: {}
         required: true
         deprecated: false
-        description: null
-        allowEmptyValue: false
   /a/: 
     get: 
       tags: 
         - 'App2Controller'
       responses: 
         200: 
-          description: 'Hello world response'
+          description: 'Success response'
+          headers: {}
           content: 
             text/plain: 
-              type: 'text/plain'
               schema: 
-                type: 'string'
-                example: 'Post route'
+                $ref: '#/components/responses/SuccessResponse'
     parameters: 
       - name: 'name'
         in: 'query'
+        schema: {}
         required: false
         deprecated: false
-        description: null
-        allowEmptyValue: false
   /a/post: 
     post: 
       tags: 
@@ -83,17 +95,27 @@ paths:
         content: 
           application/json: 
             schema: 
-              $ref: '#/components/schemas/User'
+              type: 'string'
+              example: 'John Doe'
       responses: 
         200: 
-          description: 'Post response'
+          description: 'Success response'
+          headers: 
+            sec: 
+              description: 'Security header'
+              schema: 
+                type: 'string'
+              required: false
+              deprecated: false
           content: 
             application/json: 
-              type: 'application/json'
               schema: 
-                $ref: '#/components/schemas/User'
+                type: 'object'
+                properties: 
+                  message: 
+                    type: 'string'
+                    example: 'Post route'
             text/plain: 
-              type: 'text/plain'
               schema: 
                 type: 'string'
                 example: 'Post route'
@@ -110,9 +132,35 @@ components:
         email: 
           type: 'string'
   securitySchemes: 
-    apiKeyScheme: 
-      type: 'apiKey'
-      in: 'header'
-      name: 'Authorization'
+    basicAuth: 
+      type: 'http'
+      scheme: 'basic'
+  responses: 
+    SuccessResponse: 
+      description: 'Success response'
+      headers: {}
+      content: 
+        text/plain: 
+          schema: 
+            type: 'string'
+          examples: {}
+  parameters: 
+    NameParam: 
+      name: 'name'
+      in: 'query'
+      schema: {}
+      required: false
+      deprecated: false
+  requestBodies: 
+    DataBody: 
+      data: 
+        name: 
+          application/json: 
+            schema: 
+              type: 'string'
+            examples: {}
+      required: true
+  headers: {}
+  examples: {}
 security: 
-  - apiKeyScheme: []
+  - basicAuth: []

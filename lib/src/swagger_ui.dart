@@ -1,5 +1,9 @@
-import 'package:serinus_swagger/src/api_spec.dart';
+
 import 'package:yaml_writer/yaml_writer.dart';
+
+import 'api_spec.dart';
+import 'components/components.dart';
+import 'document.dart';
 
 class SwaggerUi {
 
@@ -55,9 +59,7 @@ class SwaggerUi {
 
 class SwaggerYamlSpec {
 
-  final String title;
-  final String version;
-  final String description;
+  final DocumentSpecification document;
   final String host;
   final String basePath;
   final List<PathObject> paths;
@@ -65,9 +67,7 @@ class SwaggerYamlSpec {
   final List<Map<String, List<dynamic>>> security;
 
   SwaggerYamlSpec({
-    required this.title,
-    required this.version,
-    required this.description,
+    required this.document,
     required this.host,
     required this.basePath,
     required this.paths,
@@ -79,11 +79,7 @@ class SwaggerYamlSpec {
     final writer = YamlWriter();
     final doc = writer.write({
       'openapi': '3.0.0',
-      'info': {
-        'title': title,
-        'version': version,
-        'description': description,
-      },
+      'info': document.toJson(),
       'paths': preparePathObj(),
       'components': generateRecursiveComponent(),
       'security': security,
@@ -117,14 +113,16 @@ class SwaggerYamlSpec {
         final Map<String, dynamic> responsesObj = {};
         for (final response in method.responses) {
           final Map<String, dynamic> responseObj = {};
-          responseObj['description'] = response.description;
+          responseObj['description'] = response.content.description;
           final Map<String, dynamic> contentObj = {};
-          for (final content in response.content) {
+          for (final content in response.content.content) {
             final Map<String, dynamic> schemaObj = {};
-            schemaObj['type'] = content.type.mimeType;
             schemaObj['schema'] = parseContentSchema(content.schema);
-            contentObj[content.type.mimeType] = schemaObj;
+            contentObj[content.encoding.mimeType] = schemaObj;
           }
+          responseObj['headers'] = {
+            ...response.content.headers
+          };
           responseObj['content'] = contentObj;
           responsesObj['${response.code}'] = responseObj;
         }
@@ -132,10 +130,10 @@ class SwaggerYamlSpec {
           final Map<String, dynamic> requestBodyObj = {};
           requestBodyObj['required'] = method.requestBody!.required;
           requestBodyObj['content'] = {};
-          for (final content in method.requestBody!.content) {
+          for (final content in method.requestBody!.value.values) {
             final Map<String, dynamic> schemaObj = {};
             schemaObj['schema'] = parseContentSchema(content.schema);
-            requestBodyObj['content'][content.type.mimeType] = schemaObj;
+            requestBodyObj['content'][content.encoding.mimeType] = schemaObj;
           }
           methodObj['requestBody'] = requestBodyObj;
         }
@@ -148,15 +146,15 @@ class SwaggerYamlSpec {
     return pathsObj;
   }
 
-  Map<String, dynamic> parseContentSchema(ContentSchema schema){
+  Map<String, dynamic> parseContentSchema(SchemaObject schema){
     final Map<String, dynamic> schemaObj = {};
     final String type = schema.type.toString().split('.').last;
     if(type == 'ref'){
-      schemaObj['\$ref'] = '#/components/schemas/${schema.value}';
+      schemaObj['\$ref'] = '#/components/${schema.value}';
     }else{
       schemaObj['type'] = type == 'text' ? 'string' : type;
     }
-    if(schema.type == ContentSchemaType.object){
+    if(schema.type == SchemaType.object){
       if(schema.value != null){
         final Map<String, dynamic> propertiesObj = {};
         for (final key in schema.value!.keys) {
@@ -192,7 +190,7 @@ class PathMethod {
     final String? description;
     final List<String> tags;
     final List<ApiResponse> responses;
-    final List<ApiSpecParameter> parameters;
+    final List<ParameterObject> parameters;
     final RequestBody? requestBody;
   
     PathMethod({
@@ -204,24 +202,4 @@ class PathMethod {
       this.parameters = const [],
       this.requestBody
     });
-}
-
-class Component<T> {
-
-  final String name;
-  final T? value;
-
-  Component({
-    required this.name,
-    required this.value,
-  }) {
-    if(value == null) throw Exception('Component value cannot be null');
-  }
-
-  Map<String, dynamic> toJson(){
-    return {
-      name: value
-    };
-  }
-
 }

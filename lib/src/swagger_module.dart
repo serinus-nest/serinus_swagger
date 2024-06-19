@@ -1,9 +1,15 @@
 import 'dart:io';
 
 import 'package:serinus/serinus.dart';
-import 'package:serinus_swagger/serinus_swagger.dart';
-import 'package:serinus_swagger/src/swagger_ui.dart';
-import 'package:serinus_swagger/src/swagger_ui_module.dart';
+import 'package:serinus_swagger/src/components/response_object.dart';
+
+import 'api_route.dart';
+import 'api_spec.dart';
+import 'components/components.dart';
+import 'document.dart';
+import 'swagger_ui.dart';
+import 'swagger_ui_module.dart';
+
 
 class SwaggerModule {
   
@@ -42,16 +48,16 @@ class SwaggerModule {
       final controllerPath = controller.path;
       final controllerName = controller.runtimeType;
       for(final route in controller.routes.keys){
-        final pathParameters = <ApiSpecParameter>[];
+        final pathParameters = <ParameterObject>[];
         final routePath = route.path.split('/');
         for(final path in routePath){
           if(path.startsWith('<') && path.endsWith('>')){
             final pathName = path.substring(1, path.length - 1);
             routePath[routePath.indexOf(path)] = '{$pathName}';
             pathParameters.add(
-              ApiSpecParameter(
+              ParameterObject(
                 name: pathName, 
-                type: SpecParameterType.path,
+                in_: SpecParameterType.path,
                 required: true,
               )
             );
@@ -97,13 +103,10 @@ class SwaggerModule {
             responses: [
               ApiResponse(
                 code: 200,
-                description: 'Success',
-                content: [
-                  ApiContent(
-                    type: ContentType.text,
-                    schema: ContentSchema()
-                  )
-                ]
+                content: ResponseObject(
+                  description: 'Success response',
+                  content: []
+                )
               )
             ]
           ));
@@ -114,19 +117,27 @@ class SwaggerModule {
       }
 
     }
-    final securitySchema = components?.where((element) => element.value is SecuritySchema).toList() ?? [];
+    final List<Component<SecurityObject>> securitySchema = List<Component<SecurityObject>>.from(
+      components?.where((element) => element.value is SecurityObject) ?? <Component<SecurityObject>>[]
+    );
+    if(document.securitySchema != null){
+      securitySchema.add(document.securitySchema!);
+    }
     _swaggerYamlSpec = SwaggerYamlSpec(
-      title: document.title,
-      version: document.version,
-      description: document.description,
+      document: document,
       host: 'localhost:8080',
       basePath: '/',
       paths: paths,
       components: {
-        'schemas': components?.where((element) => element.value is ContentSchema).toList() ?? [],
-        'securitySchemes': securitySchema
+        'schemas': components?.where((element) => element.value is SchemaObject).toList() ?? [],
+        'securitySchemes': securitySchema,
+        'responses': components?.where((element) => element.value is ResponseObject).toList() ?? [],
+        'parameters': components?.where((element) => element.value is ParameterObject).toList() ?? [],
+        'requestBodies': components?.where((element) => element.value is RequestBody).toList() ?? [],
+        'headers': components?.where((element) => element.value is HeaderObject).toList() ?? [],
+        'examples': components?.where((element) => element.value is ExampleObject).toList() ?? [],
       },
-      security: securitySchema.where((element) => element.value.isDefault).map((e) => {e.name: []}).toList()
+      security: securitySchema.where((element) => element.value?.isDefault ?? false).map((e) => {e.name: []}).toList()
     );
     await File('swagger.yaml').writeAsString(_swaggerYamlSpec!());
     StringBuffer sb = StringBuffer();
@@ -143,8 +154,8 @@ class SwaggerModule {
 
   Future<void> setup(String endpoint) async {
     final swaggerHtml = SwaggerUi(
-      title: _swaggerYamlSpec!.title,
-      description: _swaggerYamlSpec!.description,
+      title: _swaggerYamlSpec!.document.title,
+      description: _swaggerYamlSpec!.document.description,
       url: _swaggerUrl!.replaceAll('{{endpoint}}', endpoint.replaceAll('/', ''))
     );
     _swaggerUiModule = SwaggerUiModule(endpoint, swaggerHtml());

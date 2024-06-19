@@ -1,18 +1,8 @@
 import 'dart:io';
 
-import 'package:serinus/serinus.dart';
+import 'package:serinus_swagger/src/components/response_object.dart';
 
-abstract class ApiRoute extends Route {
-
-  final ApiSpec apiSpec;
-
-  const ApiRoute({
-    required super.path,
-    required this.apiSpec,
-    super.method = HttpMethod.get,
-    super.queryParameters,
-  });
-}
+import 'components/components.dart';
 
 class ApiSpec {
 
@@ -22,7 +12,7 @@ class ApiSpec {
   final String? operationId;
   final String? summary;
   final String? description;
-  final List<ApiSpecParameter> parameters;
+  final List<ParameterObject> parameters;
 
   const ApiSpec({
     required this.responses,
@@ -34,148 +24,48 @@ class ApiSpec {
     this.parameters = const [],
   });
 
-  Iterable<ApiSpecParameter> intersectQueryParameters(Map<String, Type> queryParameters) {
+  Iterable<ParameterObject> intersectQueryParameters(Map<String, Type> queryParameters) {
     return queryParameters.entries.map((value) {
       final param = parameters.where((element) => element.name == value.key).firstOrNull;
       if(param != null) {
         return param;
       }
-      return ApiSpecParameter(
+      return ParameterObject(
         name: value.key,
-        type: SpecParameterType.query,
+        in_: SpecParameterType.query,
       );
     });
   }
 
 }
 
-class RequestBody {
-
-  final List<ApiContent> content;
-  final bool required;
-  final String? description;
-
-  const RequestBody({
-    required this.content,
-    this.required = true,
-    this.description,
-  });
-
-}
-
 class ApiResponse {
 
   final int code;
-  final String description;
-  final List<ApiContent> content;
-
+  final ResponseObject content;
+  
   const ApiResponse({
     required this.code,
-    required this.description,
     required this.content,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      '$code': content.toJson()
+    };
+  }
 
 }
 
 class ApiContent {
 
   final ContentType type;
-  final ContentSchema schema;
+  final SchemaObject schema;
 
   const ApiContent({
     required this.type,
     required this.schema,
   });
-}
-
-enum ContentSchemaType {
-  text,
-  object,
-  ref,
-  array,
-  number,
-  integer,
-  boolean,
-}
-
-class ContentSchema<T> {
-
-  final ContentSchemaType type;
-  final ContentSchemaValue<T>? example;
-  final dynamic value;
-
-  ContentSchema({
-    this.type = ContentSchemaType.text,
-    this.example,
-    this.value
-  }) {
-    if(type == ContentSchemaType.object) {
-      if(value == null) {
-        throw Exception('Properties must be provided for object type');
-      }
-      if(example != null && example is! Map) {
-        throw Exception('Example must be a map for object type');
-      }
-    }
-  }
-
-  dynamic getExample() {
-    switch(type) {
-      case ContentSchemaType.text:
-        return example?.value.toString() ?? '';
-      case ContentSchemaType.object:
-        return {
-          for (final key in value!.keys) key: value![key]!.getExample()
-        };
-      case ContentSchemaType.ref:
-        return example?.value.toString() ?? '';
-      case ContentSchemaType.array:
-        return [...(value?.map((e) => e.getExample()) ?? [])];
-      case ContentSchemaType.number:
-        return example?.value ?? 0;
-      case ContentSchemaType.integer:
-        return example?.value ?? 0;
-      case ContentSchemaType.boolean:
-        return example?.value ?? false;
-      default:
-        return {};
-    } 
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> schemaObj = {};
-    final String t = type.toString().split('.').last;
-    if(t == 'ref') {
-      schemaObj['\$ref'] = '#/components/schemas/$value';
-    }else{
-      if(t == 'text') {
-        schemaObj['type'] = 'string';
-      }else{
-        schemaObj['type'] = t;
-      }
-    }
-    if(type == ContentSchemaType.object) {
-      if(value != null) {
-        final Map<String, dynamic> propertiesObj = {};
-        for (final key in value!.keys) {
-          propertiesObj[key] = value![key]!.toJson();
-        }
-        schemaObj['properties'] = propertiesObj;
-      }
-    }
-    return schemaObj;
-  }
-
-}
-
-class ContentSchemaValue<T> {
-
-  final T value;
-
-  const ContentSchemaValue({
-    required this.value,
-  });
-
 }
 
 enum SpecParameterType {
@@ -225,75 +115,4 @@ class ApiSpecParameter {
     };
   }
 
-}
-
-class SecuritySchema {
-
-  final SecuritySchemaType type;
-  final SecuritySchemaScheme? scheme;
-  final String? bearerFormat;
-  final SpecParameterType? inType;
-  final String? name;
-  final bool isDefault;
-
-  SecuritySchema({
-    required this.type,
-    this.scheme,
-    this.bearerFormat,
-    this.inType,
-    this.name,
-    this.isDefault = true,
-  }) {
-    if(type == SecuritySchemaType.apiKey && inType == null) {
-      throw Exception('inType must be provided for apiKey type');
-    }
-    if(type == SecuritySchemaType.apiKey && name == null) {
-      throw Exception('name must be provided for apiKey type');
-    }
-    if(
-      type == SecuritySchemaType.apiKey && ![
-        SpecParameterType.header, 
-        SpecParameterType.cookie, 
-        SpecParameterType.query
-      ].contains(inType)
-    ) {
-      throw Exception('inType must be header, cookie or query for apiKey type');
-    }
-    if(type == SecuritySchemaType.http && scheme == null) {
-      throw Exception('scheme must be provided for http type');
-    }
-    if(type == SecuritySchemaType.http && scheme == SecuritySchemaScheme.bearer && bearerFormat == null) {
-      throw Exception('bearerFormat must be provided for bearer scheme');
-    }
-  } 
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> schemaObj = {
-      'type': type.toString().split('.').last,
-    };
-    if(type == SecuritySchemaType.apiKey) {
-      schemaObj['in'] = inType.toString().split('.').last;
-      schemaObj['name'] = name;
-    }
-    if(type == SecuritySchemaType.http) {
-      schemaObj['scheme'] = scheme.toString().split('.').last;
-      if(scheme == SecuritySchemaScheme.bearer) {
-        schemaObj['bearerFormat'] = bearerFormat;
-      }
-    }
-    return schemaObj;
-  }
-
-}
-
-enum SecuritySchemaType {
-  apiKey,
-  http,
-  oauth2,
-  openIdConnect,
-}
-
-enum SecuritySchemaScheme {
-  bearer,
-  basic,
 }

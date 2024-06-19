@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:serinus_swagger/serinus_swagger.dart';
 import 'package:serinus/serinus.dart';
-import 'package:serinus_swagger/src/swagger_ui.dart';
 
 class HelloWorldRoute extends ApiRoute {
 
@@ -10,25 +9,27 @@ class HelloWorldRoute extends ApiRoute {
     path: '/',
     apiSpec: ApiSpec(
       parameters: [
-        ApiSpecParameter(
+        ParameterObject(
           name: 'name',
-          type: SpecParameterType.query,
+          in_: SpecParameterType.query,
           required: false,
         )
       ],
       responses: [
         ApiResponse(
-          code: 200,
-          description: 'Hello world response',
-          content: [
-            ApiContent(
-              type: ContentType.text,
-              schema: ContentSchema(
-                type: ContentSchemaType.text,
-                example: ContentSchemaValue<String>(value: 'Post route')
+          code: HttpStatus.ok,
+          content: ResponseObject(
+            description: 'Success response',
+            content: [
+              MediaObject(
+                encoding: ContentType.text,
+                schema: SchemaObject(
+                  type: SchemaType.ref,
+                  value: 'responses/SuccessResponse'
+                )
               )
-            )
-          ]
+            ]
+          )
         ),
       ]
     )
@@ -40,37 +41,54 @@ class PostRoute extends ApiRoute {
   PostRoute({required super.path}) : super(
     apiSpec: ApiSpec(
       requestBody: RequestBody(
+        name: 'User',
         required: false,
-        content: [
-          ApiContent(
-            type: ContentType.json,
-            schema: ContentSchema(
-              type: ContentSchemaType.ref,
-              value: 'User'
-            )
-          )
-        ]
+        value: {
+          'name': MediaObject(
+            schema: SchemaObject(
+              type: SchemaType.text,
+              example: SchemaValue<String>(value: 'John Doe')
+            ),
+            encoding: ContentType.json
+          ),
+        }
       ),
       responses: [
         ApiResponse(
           code: 200,
-          description: 'Post response',
-          content: [
-            ApiContent(
-              type: ContentType.json,
-              schema: ContentSchema(
-                type: ContentSchemaType.ref,
-                value: 'User'
+          content: ResponseObject(
+            description: 'Success response',
+            headers: {
+              'sec': HeaderObject(
+                description: 'Security header',
+                schema: SchemaObject(
+                  type: SchemaType.text,
+                  example: SchemaValue<String>(value: 'Bearer token')
+                )
               )
-            ),
-            ApiContent(
-              type: ContentType.text,
-              schema: ContentSchema(
-                type: ContentSchemaType.text,
-                example: ContentSchemaValue<String>(value: 'Post route')
+            },
+            content: [
+              MediaObject(
+                encoding: ContentType.json,
+                schema: SchemaObject(
+                  type: SchemaType.object,
+                  value: {
+                    'message': SchemaObject(
+                      type: SchemaType.text,
+                      example: SchemaValue<String>(value: 'Post route')
+                    )
+                  }
+                )
+              ),
+              MediaObject(
+                schema: SchemaObject(
+                  type: SchemaType.text,
+                  example: SchemaValue<String>(value: 'Post route')
+                ),
+                encoding: ContentType.text
               )
-            )
-          ]
+            ]
+          )
         )
       ]
     ),
@@ -133,7 +151,16 @@ void main(List<String> args) async {
     title: 'Serinus Test Swagger',
     version: '1.0',
     description: 'API documentation for the Serinus project',
-  );
+    license: LicenseObject(
+      name: 'MIT',
+      url: 'https://opensource.org/licenses/MIT',
+    ),
+    contact: ContactObject(
+      name: 'Serinus',
+      url: 'https://serinus.dev',
+      email: ''
+    )
+  )..addBasicAuth();
   final app = await serinus.createApplication(
     entrypoint: AppModule(),
   );
@@ -141,25 +168,56 @@ void main(List<String> args) async {
     app, 
     document,
     components: [
-      Component(
+      Component<SchemaObject>(
         name: 'User', 
-        value: ContentSchema(
-          type: ContentSchemaType.object, 
+        value: SchemaObject(
+          type: SchemaType.object, 
           value: {
-            'name': ContentSchema(),
-            'age': ContentSchema(type: ContentSchemaType.integer),
-            'email': ContentSchema(),
+            'name': SchemaObject(),
+            'age': SchemaObject(type: SchemaType.integer),
+            'email': SchemaObject(),
           }
         )
       ),
-      Component<SecuritySchema>(
-        name: 'apiKeyScheme',
-        value: SecuritySchema(
-          type: SecuritySchemaType.apiKey,
-          name: 'Authorization',
-          inType: SpecParameterType.header
+      Component<ResponseObject>(
+        name: 'SuccessResponse',
+        value: ResponseObject(
+          description: 'Success response',
+          content: [
+            MediaObject(
+              schema: SchemaObject(
+                type: SchemaType.text,
+                example: SchemaValue<String>(value: 'Hello world')
+              ),
+              encoding: ContentType.text
+            )
+          ]
         )
-      )
+      ),
+      Component<ParameterObject>(
+        name: 'NameParam',
+        value: ParameterObject(
+          name: 'name',
+          in_: SpecParameterType.query,
+          required: false,
+        )
+      ),
+      Component<RequestBody>(
+        name: 'DataBody',
+        value: RequestBody(
+          name: 'data',
+          value: {
+            'name': MediaObject(
+              schema: SchemaObject(
+                type: SchemaType.text,
+                example: SchemaValue<String>(value: 'John Doe')
+              ),
+              encoding: ContentType.json
+            ),
+          },
+          required: true,
+        )
+      ),
     ]
   );
   await swagger.setup(
