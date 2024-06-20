@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:serinus_swagger/src/components/response_object.dart';
-
 import 'components/components.dart';
 
 class ApiSpec {
