@@ -48,7 +48,6 @@ final class SchemaObject<T> extends ComponentValue {
           for (final key in value!.keys) key: value![key]!.getExample()
         };
       case SchemaType.ref:
-        print(example?.value.toString() ?? '');
         return example?.value.toString() ?? '';
       case SchemaType.array:
         return [...(value?.map((e) => e.getExample()) ?? [])];
@@ -68,7 +67,6 @@ final class SchemaObject<T> extends ComponentValue {
     final Map<String, dynamic> schemaObj = {};
     final String t = type.toString().split('.').last;
     if(t == 'ref') {
-      print(value);
       schemaObj['\$ref'] = '#/components/$value';
     }else{
       if(t == 'text') {
