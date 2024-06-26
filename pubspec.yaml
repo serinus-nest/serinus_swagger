@@ -1,14 +1,16 @@
 name: serinus_swagger
 description: A sample command-line application.
-version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+version: 0.0.1
+repository: https://github.com/serinus-nest/serinus_swagger
+homepage: https://docs.serinus.app/plugins/swagger
+documentation: https://docs.serinus.app/plugins/swagger
 
 environment:
   sdk: ^3.3.3
 
 # Add regular dependencies here.
 dependencies:
-  serinus: ^0.2.1
+  serinus: ^0.4.1
   yaml_writer: ^2.0.0
   # path: ^1.8.0
 

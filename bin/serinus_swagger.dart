@@ -3,59 +3,92 @@ import 'dart:io';
 import 'package:serinus_swagger/serinus_swagger.dart';
 import 'package:serinus/serinus.dart';
 
-class HelloWorldRoute extends ApiSpecRoute {
+class HelloWorldRoute extends ApiRoute {
 
-  HelloWorldRoute() : super(
+  HelloWorldRoute({super.queryParameters}) : super(
     path: '/',
     apiSpec: ApiSpec(
+      parameters: [
+        ParameterObject(
+          name: 'name',
+          in_: SpecParameterType.query,
+          required: false,
+        )
+      ],
       responses: [
         ApiResponse(
-          code: 200,
-          description: 'Hello world response',
-          content: [
-            ApiResponseContent(
-              type: ContentType.text,
-              schema: ContentSchema(
-                type: ContentSchemaType.text,
-                example: 'Hello world'
+          code: HttpStatus.ok,
+          content: ResponseObject(
+            description: 'Success response',
+            content: [
+              MediaObject(
+                encoding: ContentType.text,
+                schema: SchemaObject(
+                  type: SchemaType.ref,
+                  value: 'responses/SuccessResponse'
+                )
               )
-            )
-          ]
+            ]
+          )
         ),
       ]
     )
   );
 }
 
-class PostRoute extends ApiSpecRoute {
+class PostRoute extends ApiRoute {
 
   PostRoute({required super.path}) : super(
     apiSpec: ApiSpec(
+      requestBody: RequestBody(
+        name: 'User',
+        required: false,
+        value: {
+          'name': MediaObject(
+            schema: SchemaObject(
+              type: SchemaType.text,
+              example: SchemaValue<String>(value: 'John Doe')
+            ),
+            encoding: ContentType.json
+          ),
+        }
+      ),
       responses: [
         ApiResponse(
           code: 200,
-          description: 'Post response',
-          content: [
-            ApiResponseContent(
-              type: ContentType.json,
-              schema: ContentSchema(
-                type: ContentSchemaType.object,
-                properties: {
-                  'message': ContentSchema(
-                    type: ContentSchemaType.text,
-                    example: 'Post route'
-                  )
-                }
+          content: ResponseObject(
+            description: 'Success response',
+            headers: {
+              'sec': HeaderObject(
+                description: 'Security header',
+                schema: SchemaObject(
+                  type: SchemaType.text,
+                  example: SchemaValue<String>(value: 'Bearer token')
+                )
               )
-            ),
-            ApiResponseContent(
-              type: ContentType.text,
-              schema: ContentSchema(
-                type: ContentSchemaType.text,
-                example: 'Post route'
+            },
+            content: [
+              MediaObject(
+                encoding: ContentType.json,
+                schema: SchemaObject(
+                  type: SchemaType.object,
+                  value: {
+                    'message': SchemaObject(
+                      type: SchemaType.text,
+                      example: SchemaValue<String>(value: 'Post route')
+                    )
+                  }
+                )
+              ),
+              MediaObject(
+                schema: SchemaObject(
+                  type: SchemaType.text,
+                  example: SchemaValue<String>(value: 'Post route')
+                ),
+                encoding: ContentType.text
               )
-            )
-          ]
+            ]
+          )
         )
       ]
     ),
@@ -66,6 +99,23 @@ class PostRoute extends ApiSpecRoute {
 class AppController extends Controller {
 
   AppController({super.path = '/'}){
+    on(HelloWorldRoute(
+      queryParameters: {
+        'name': String,
+      }
+    ), _handleHelloWorld);
+    on(PostRoute(path: '/post/<data>'), (context) async => Response.json({'message': 'Post ${context.pathParameters['data']}'}));
+  }
+
+  Future<Response> _handleHelloWorld(RequestContext context) async {
+    return Response.text('Hello world');
+  }
+
+}
+
+class App2Controller extends Controller {
+
+  App2Controller({super.path = '/a'}){
     on(HelloWorldRoute(), _handleHelloWorld);
     on(PostRoute(path: '/post'), (context) async => Response.json({'message': 'Post route'}));
   }
@@ -80,7 +130,8 @@ class AppModule extends Module {
 
   AppModule(): super(
     controllers: [
-      AppController()
+      AppController(),
+      App2Controller()
     ],
     imports: [
       App2Module()
@@ -97,15 +148,80 @@ class App2Module extends Module {
 
 void main(List<String> args) async {
   final document = DocumentSpecification(
-    title: 'Serinus API',
+    title: 'Serinus Test Swagger',
     version: '1.0',
     description: 'API documentation for the Serinus project',
-  );
-
+    license: LicenseObject(
+      name: 'MIT',
+      url: 'https://opensource.org/licenses/MIT',
+    ),
+    contact: ContactObject(
+      name: 'Serinus',
+      url: 'https://serinus.dev',
+      email: ''
+    )
+  )..addBasicAuth();
   final app = await serinus.createApplication(
     entrypoint: AppModule(),
   );
-  final swagger = await SwaggerModule.create(app, document);
-  await swagger.setup('/api');
+  final swagger = await SwaggerModule.create(
+    app, 
+    document,
+    components: [
+      Component<SchemaObject>(
+        name: 'User', 
+        value: SchemaObject(
+          type: SchemaType.object, 
+          value: {
+            'name': SchemaObject(),
+            'age': SchemaObject(type: SchemaType.integer),
+            'email': SchemaObject(),
+          }
+        )
+      ),
+      Component<ResponseObject>(
+        name: 'SuccessResponse',
+        value: ResponseObject(
+          description: 'Success response',
+          content: [
+            MediaObject(
+              schema: SchemaObject(
+                type: SchemaType.text,
+                example: SchemaValue<String>(value: 'Hello world')
+              ),
+              encoding: ContentType.text
+            )
+          ]
+        )
+      ),
+      Component<ParameterObject>(
+        name: 'NameParam',
+        value: ParameterObject(
+          name: 'name',
+          in_: SpecParameterType.query,
+          required: false,
+        )
+      ),
+      Component<RequestBody>(
+        name: 'DataBody',
+        value: RequestBody(
+          name: 'data',
+          value: {
+            'name': MediaObject(
+              schema: SchemaObject(
+                type: SchemaType.text,
+                example: SchemaValue<String>(value: 'John Doe')
+              ),
+              encoding: ContentType.json
+            ),
+          },
+          required: true,
+        )
+      ),
+    ]
+  );
+  await swagger.setup(
+    '/api',
+  );
   await app.serve();
 }

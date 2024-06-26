@@ -1,89 +1,116 @@
 import 'dart:io';
 
-import 'package:serinus/serinus.dart';
-
-abstract class ApiSpecRoute extends Route {
-
-  final ApiSpec apiSpec;
-
-  ApiSpecRoute({
-    required super.path,
-    required this.apiSpec,
-    super.method = HttpMethod.get,
-    super.queryParameters,
-  });
-}
+import 'components/components.dart';
 
 class ApiSpec {
 
   final List<String> tags;
   final List<ApiResponse> responses;
+  final RequestBody? requestBody;
   final String? operationId;
   final String? summary;
   final String? description;
+  final List<ParameterObject> parameters;
 
-  ApiSpec({
+  const ApiSpec({
     required this.responses,
     this.tags = const [],
     this.operationId,
+    this.requestBody,
     this.summary,
     this.description,
+    this.parameters = const [],
   });
+
+  Iterable<ParameterObject> intersectQueryParameters(Map<String, Type> queryParameters) {
+    return queryParameters.entries.map((value) {
+      final param = parameters.where((element) => element.name == value.key).firstOrNull;
+      if(param != null) {
+        return param;
+      }
+      return ParameterObject(
+        name: value.key,
+        in_: SpecParameterType.query,
+      );
+    });
+  }
 
 }
 
 class ApiResponse {
-  final int code;
-  final String description;
-  final List<ApiResponseContent> content;
 
-  ApiResponse({
+  final int code;
+  final ResponseObject content;
+  
+  const ApiResponse({
     required this.code,
-    required this.description,
     required this.content,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      '$code': content.toJson()
+    };
+  }
+
 }
 
-class ApiResponseContent {
-  final ContentType type;
-  final ContentSchema schema;
+class ApiContent {
 
-  ApiResponseContent({
+  final ContentType type;
+  final SchemaObject schema;
+
+  const ApiContent({
     required this.type,
     required this.schema,
   });
 }
 
-enum ContentSchemaType {
-  text,
-  object,
-  ref,
-  array,
-  number,
-  integer,
-  boolean,
+enum SpecParameterType {
+  query,
+  path,
+  header,
+  cookie,
 }
 
-class ContentSchema {
+class ApiSpecParameter {
 
-  final ContentSchemaType type;
-  final dynamic example;
-  final Map<String, ContentSchema>? properties;
+  final String name;
+  final SpecParameterType type;
+  final bool required;
+  final bool deprecated;
+  final String? description;
+  final bool allowEmptyValue;
 
-  ContentSchema({
-    this.type = ContentSchemaType.text,
-    this.example,
-    this.properties
-  }){
-    if(type == ContentSchemaType.object){
-      if(properties == null){
-        throw Exception('Properties must be provided for object type');
-      }
-      if(example != null && example is! Map){
-        throw Exception('Example must be a map for object type');
-      }
+  ApiSpecParameter({
+    required this.name,
+    required this.type,
+    this.required = false,
+    this.deprecated = false,
+    this.description,
+    this.allowEmptyValue = false,
+  }) {
+    if(type == SpecParameterType.path && required == false) {
+      throw Exception('Path parameters must be required');
     }
+    if(type != SpecParameterType.query && allowEmptyValue) {
+      throw Exception('Empty value is only allowed for query parameters');
+    }
+  }
+
+  bool get ignore {
+    return type == SpecParameterType.header && ['accept', 'content-type', 'authorization'].contains(name.toLowerCase());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'in': type.toString().split('.').last,
+      'required': required,
+      'deprecated': deprecated,
+      'description': description,
+      'allowEmptyValue': allowEmptyValue,
+    };
   }
 
 }
