@@ -1,12 +1,12 @@
 name: serinus_swagger
-description: A sample command-line application.
-version: 0.0.1
+description: A Serinus plugin to generate OpenAPI documentation from your Serinus app.
+version: 1.0.0
 repository: https://github.com/serinus-nest/serinus_swagger
 homepage: https://docs.serinus.app/plugins/swagger
 documentation: https://docs.serinus.app/plugins/swagger
 
 environment:
-  sdk: ^3.3.3
+  sdk: '>=3.0.0 <4.0.0'
 
 # Add regular dependencies here.
 dependencies:
