@@ -8,8 +8,10 @@ import 'document.dart';
 class SwaggerUi {
   /// The [url] property contains the URL of the Swagger UI.
   final String url;
+
   /// The [title] property contains the title of the Swagger UI.
   final String title;
+
   /// The [description] property contains the description of the Swagger UI.
   final String description;
 
@@ -64,14 +66,19 @@ class SwaggerUi {
 class SwaggerYamlSpec {
   /// The [document] property contains the document specification.
   final DocumentSpecification document;
+
   /// The [host] property contains the host of the Swagger YAML.
   final String host;
+
   /// The [basePath] property contains the base path of the Swagger YAML.
   final String basePath;
+
   /// The [paths] property contains the paths of the Swagger YAML.
   final List<PathObject> paths;
+
   /// The [components] property contains the components of the Swagger YAML.
   final Map<String, List<Component>> components;
+
   /// The [security] property contains the security of the Swagger YAML.
   final List<Map<String, List<dynamic>>> security;
 
@@ -189,6 +196,7 @@ class SwaggerYamlSpec {
 class PathObject {
   /// The [path] property contains the path of the path.
   final String path;
+
   /// The [methods] property contains the methods of the path.
   final List<PathMethod> methods;
 
@@ -203,16 +211,22 @@ class PathObject {
 class PathMethod {
   /// The [method] property contains the method of the path.
   final String method;
+
   /// The [summary] property contains the summary of the path.
   final String? summary;
+
   /// The [description] property contains the description of the path.
   final String? description;
+
   /// The [tags] property contains the tags of the path.
   final List<String> tags;
+
   /// The [responses] property contains the responses of the path.
   final List<ApiResponse> responses;
+
   /// The [parameters] property contains the parameters of the path.
   final List<ParameterObject> parameters;
+
   /// The [requestBody] property contains the request body of the path.
   final RequestBody? requestBody;
 

@@ -27,6 +27,7 @@ class SwaggerController extends Controller {
 class SwaggerUiModule extends Module {
   /// The html content of the swagger UI
   final String swaggerHtml;
+
   /// The path to serve the swagger UI
   final String finalPath;
 

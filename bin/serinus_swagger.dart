@@ -82,8 +82,8 @@ class AppController extends Controller {
         _handleHelloWorld);
     on(
         PostRoute(path: '/post/<data>'),
-        (context) async => Response.json(
-            {'message': 'Post ${context.pathParameters['data']}'}));
+        (context) async =>
+            Response.json({'message': 'Post ${context.params['data']}'}));
   }
 
   Future<Response> _handleHelloWorld(RequestContext context) async {

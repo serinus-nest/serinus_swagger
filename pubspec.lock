@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "67.0.0"
+  acanthis:
+    dependency: transitive
+    description:
+      name: acanthis
+      sha256: a64115c48dba3044b0d1ede40709c4a7d182c1f8784b5b113beacd905809ef8b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   analyzer:
     dependency: transitive
     description:
@@ -81,6 +89,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+  email_validator:
+    dependency: transitive
+    description:
+      name: email_validator
+      sha256: e9a90f27ab2b915a27d7f9c2a7ddda5dd752d6942616ee83529b686fc086221b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.17"
   equatable:
     dependency: transitive
     description:
@@ -245,10 +261,10 @@ packages:
     dependency: "direct main"
     description:
       name: serinus
-      sha256: "73085c94867dc1ccdf7ae84e8be8b118568c579935e3ded1c0dbbc035dd9d18c"
+      sha256: "11bc7fe44a05c9b672e366bfc594c24df7307446865f991af820bfd1af03e32e"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.1"
+    version: "0.5.0"
   shelf:
     dependency: transitive
     description:

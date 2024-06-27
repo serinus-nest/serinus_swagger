@@ -26,8 +26,10 @@ class SchemaValue<T> {
 final class SchemaObject<T> extends ComponentValue {
   /// The [type] property contains the type of the schema object.
   final SchemaType type;
+
   /// The [example] property contains the example of the schema object.
   final SchemaValue<T>? example;
+
   /// The [value] property contains the value of the schema object.
   final dynamic value;
 

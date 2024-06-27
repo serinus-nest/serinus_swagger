@@ -5,16 +5,22 @@ import '../api_spec.dart';
 class ParameterObject extends DescriptiveObject {
   /// The [name] property contains the name of the parameter.
   final String name;
+
   /// The [in_] property contains the location of the parameter.
   final SpecParameterType in_;
+
   /// The [description] property contains the description of the parameter.
   final String? description;
+
   /// The [required] property contains the required status of the parameter.
   final bool required;
+
   /// The [deprecated] property contains the deprecated status of the parameter.
   final bool deprecated;
+
   /// The [schema] property contains the schema of the parameter.
   final SchemaObject? schema;
+
   /// The [examples] property contains the examples of the parameter.
   final Map<String, DescriptiveObject> examples;
 

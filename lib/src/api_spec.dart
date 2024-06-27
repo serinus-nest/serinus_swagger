@@ -6,16 +6,22 @@ import 'components/components.dart';
 class ApiSpec {
   /// The [tags] property contains the tags of the API specification.
   final List<String> tags;
+
   /// The [responses] property contains the responses of the API specification.
   final List<ApiResponse> responses;
+
   /// The [requestBody] property contains the request body of the API specification.
   final RequestBody? requestBody;
+
   /// The [operationId] property contains the operation ID of the API specification.
   final String? operationId;
+
   /// The [summary] property contains the summary of the API specification.
   final String? summary;
+
   /// The [description] property contains the description of the API specification.
   final String? description;
+
   /// The [parameters] property contains the parameters of the API specification.
   final List<ParameterObject> parameters;
 
@@ -51,6 +57,7 @@ class ApiSpec {
 class ApiResponse {
   /// The [code] property contains the code of the response.
   final int code;
+
   /// The [content] property contains the content of the response.
   final ResponseObject content;
 
@@ -70,6 +77,7 @@ class ApiResponse {
 class ApiContent {
   /// The [type] property contains the type of the content.
   final ContentType type;
+
   /// The [schema] property contains the schema of the content.
   final SchemaObject schema;
 
@@ -93,14 +101,19 @@ enum SpecParameterType {
 class ApiSpecParameter {
   /// The [name] property contains the name of the parameter.
   final String name;
+
   /// The [type] property contains the type of the parameter.
   final SpecParameterType type;
+
   /// The [required] property contains the required of the parameter.
   final bool required;
+
   /// The [deprecated] property contains the deprecated of the parameter.
   final bool deprecated;
+
   /// The [description] property contains the description of the parameter.
   final String? description;
+
   /// The [allowEmptyValue] property contains the allow empty value of the parameter.
   final bool allowEmptyValue;
 

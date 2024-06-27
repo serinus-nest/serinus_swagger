@@ -2,6 +2,7 @@
 class Component<T extends ComponentValue> {
   /// The [name] property contains the name of the component.
   final String name;
+
   /// The [value] property contains the value of the component.
   final T? value;
 

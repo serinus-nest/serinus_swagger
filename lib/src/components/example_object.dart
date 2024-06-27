@@ -4,8 +4,10 @@ import 'components.dart';
 final class ExampleObject extends DescriptiveObject {
   /// The [value] property contains the value of the example.
   final dynamic value;
+
   /// The [summary] property contains the summary of the example.
   final String? summary;
+
   /// The [description] property contains the description of the example.
   final String? description;
 

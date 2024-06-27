@@ -13,14 +13,19 @@ import 'swagger_ui_module.dart';
 class SwaggerModule {
   /// The [app] property contains the application instance.
   final Application app;
+
   /// The [document] property contains the document specification.
   final DocumentSpecification document;
+
   /// The [swaggerYamlSpec] property contains the Swagger YAML specification.
   SwaggerYamlSpec? _swaggerYamlSpec;
+
   /// The [swaggerUiModule] property contains the Swagger UI module.
   SwaggerUiModule? _swaggerUiModule;
+
   /// The [swaggerUrl] property contains the Swagger URL.
   String? _swaggerUrl;
+
   /// The [components] property contains the components.
   final List<Component>? components;
 
@@ -51,9 +56,9 @@ class SwaggerModule {
     for (final controller in controllers) {
       final controllerPath = controller.path;
       final controllerName = controller.runtimeType;
-      for (final route in controller.routes.keys) {
+      for (final route in controller.routes.values) {
         final pathParameters = <ParameterObject>[];
-        final routePath = route.path.split('/');
+        final routePath = route.route.path.split('/');
         for (final path in routePath) {
           if (path.startsWith('<') && path.endsWith('>')) {
             final pathName = path.substring(1, path.length - 1);
@@ -65,7 +70,7 @@ class SwaggerModule {
             ));
           }
         }
-        final routeMethod = route.method;
+        final routeMethod = route.route.method;
         StringBuffer sb = StringBuffer();
         if (globalPrefix != null) {
           sb.write('/$globalPrefix');

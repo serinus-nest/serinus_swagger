@@ -5,16 +5,22 @@ import 'components/components.dart';
 class DocumentSpecification {
   /// The [title] property contains the title of the document.
   final String title;
+
   /// The [version] property contains the version of the document.
   final String version;
+
   /// The [description] property contains the description of the document.
   final String description;
+
   /// The [termsOfService] property contains the terms of service of the document.
   final String? termsOfService;
+
   /// The [securitySchema] property contains the security schema of the document.
   Component<SecurityObject>? securitySchema;
+
   /// The [contact] property contains the contact information of the document.
   final ContactObject? contact;
+
   /// The [license] property contains the license information of the document.
   final LicenseObject? license;
 
@@ -117,8 +123,10 @@ class DocumentSpecification {
 final class ContactObject {
   /// The [name] property contains the name of the contact.
   final String name;
+
   /// The [url] property contains the URL of the contact.
   final String url;
+
   /// The [email] property contains the email of the contact.
   final String email;
 
@@ -134,8 +142,10 @@ final class ContactObject {
 final class LicenseObject {
   /// The [name] property contains the name of the license.
   final String name;
+
   /// The [identifier] property contains the identifier of the license.
   final String? identifier;
+
   /// The [url] property contains the URL of the license.
   final String url;
 

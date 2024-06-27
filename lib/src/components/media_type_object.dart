@@ -6,8 +6,10 @@ import 'components.dart';
 class MediaObject extends ComponentValue {
   /// The [schema] property contains the schema of the media object.
   final SchemaObject schema;
+
   /// The [examples] property contains the examples of the media object.
   final Map<String, DescriptiveObject> examples;
+
   /// The [encoding] property contains the encoding of the media object.
   final ContentType encoding;
 

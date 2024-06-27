@@ -11,8 +11,10 @@ class ReferenceObject extends DescriptiveObject {
 
   /// The [ref] property contains the reference of the reference object.
   final String ref;
+
   /// The [description] property contains the description of the reference object.
   final String? description;
+
   /// The [summary] property contains the summary of the reference object.
   final String? summary;
 

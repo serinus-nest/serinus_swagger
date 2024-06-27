@@ -5,18 +5,25 @@ import 'component.dart';
 final class SecurityObject extends ComponentValue {
   /// The [type] property contains the type of the security object.
   final SecurityType type;
+
   /// The [scheme] property contains the scheme of the security object.
   final SecurityScheme? scheme;
+
   /// The [bearerFormat] property contains the bearer format of the security object.
   final String? bearerFormat;
+
   /// The [inType] property contains the in type of the security object.
   final SpecParameterType? inType;
+
   /// The [name] property contains the name of the security object.
   final String? name;
+
   /// The [isDefault] property contains the default status of the security object.
   final bool isDefault;
+
   /// The [flows] property contains the flows of the security object.
   final FlowsObject? flows;
+
   /// The [openIdConnectUrl] property contains the openIdConnectUrl of the security object.
   final String? openIdConnectUrl;
 
@@ -119,10 +126,13 @@ enum SecurityScheme {
 class FlowsObject {
   /// The [implicit] property contains the implicit flow object.
   final ImplicitFlowObject? implicit;
+
   /// The [password] property contains the password flow object.
   final CredentialsFlowObject? password;
+
   /// The [clientCredentials] property contains the client credentials flow object.
   final CredentialsFlowObject? clientCredentials;
+
   /// The [authorizationCode] property contains the authorization code flow object.
   final AuthorizationCodeFlowObject? authorizationCode;
 
@@ -151,8 +161,10 @@ class FlowsObject {
 final class ImplicitFlowObject {
   /// The [authorizationUrl] property contains the authorization URL of the implicit flow object.
   final String? authorizationUrl;
+
   /// The [refreshUrl] property contains the refresh URL of the implicit flow object.
   final String refreshUrl;
+
   /// The [scopes] property contains the scopes of the implicit flow object.
   final Map<String, String> scopes;
 
@@ -177,10 +189,13 @@ final class ImplicitFlowObject {
 final class AuthorizationCodeFlowObject {
   /// The [authorizationUrl] property contains the authorization URL of the authorization code flow object.
   final String authorizationUrl;
+
   /// The [tokenUrl] property contains the token URL of the authorization code flow object.
   final String tokenUrl;
+
   /// The [refreshUrl] property contains the refresh URL of the authorization code flow object.
   final String refreshUrl;
+
   /// The [scopes] property contains the scopes of the authorization code flow object.
   final Map<String, String> scopes;
 
@@ -207,8 +222,10 @@ final class AuthorizationCodeFlowObject {
 final class CredentialsFlowObject {
   /// The [tokenUrl] property contains the token URL of the credentials flow object.
   final String tokenUrl;
+
   /// The [refreshUrl] property contains the refresh URL of the credentials flow object.
   final String refreshUrl;
+
   /// The [scopes] property contains the scopes of the credentials flow object.
   final Map<String, String> scopes;
 

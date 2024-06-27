@@ -4,8 +4,10 @@ import 'components.dart';
 final class RequestBody extends ComponentValue {
   /// The [name] property contains the name of the request body object.
   final String name;
+
   /// The [value] property contains the value of the request body object.
   final Map<String, MediaObject> value;
+
   /// The [required] property contains the required status of the request body object.
   final bool required;
 

@@ -4,8 +4,10 @@ import 'components.dart';
 final class ResponseObject extends ComponentValue {
   /// The [description] property contains the description of the response object.
   final String description;
+
   /// The [headers] property contains the headers of the response object.
   final Map<String, HeaderObject> headers;
+
   /// The [content] property contains the content of the response object.
   final List<MediaObject> content;
 
